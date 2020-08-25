@@ -152,3 +152,9 @@ exports.delete = function(req, res){
 		res.json(data);
 	});
 }
+
+exports.getShops= function(req, res) {
+	queries.getShops(function(err, data){
+		res.json(data);
+	});
+};

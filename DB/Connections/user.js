@@ -55,6 +55,16 @@ exports.getUsers = function(callback) {
 	});
 };
 
+exports.getShops = function(callback) {
+	var sqlQuery = "SELECT id, email, username,	name, balance, type	\
+					FROM user										\
+					WHERE type = 'shop'								\
+					Order by type";
+	DBHelper.doQuery(sqlQuery, function(err, data) {
+		callback(err, data);
+	});
+};
+
 exports.get = function(id, callback) {
 	var sqlQuery = "SELECT email, username, name, balance, type		\
 					FROM user										\
