@@ -50,3 +50,61 @@ exports.delete = function(req, res){
 		res.json(data);
 	});
 }
+
+/*	-- -----------------------------------------------------
+	-- 						CATEGORY
+	-- -----------------------------------------------------*/
+
+exports.createCtgr = function(req, res) {
+	var category = {
+		name: 	req.body.name,
+		desc: 	req.body.desc
+	};				
+	queries.createCtgr(category, function(err, data){
+		res.json(data);
+	});
+};
+
+exports.deleteCtgr = function(req, res){
+	queries.deleteCtgr(req.param('id'), function(err, data){
+		res.json(data);
+	});
+}
+
+exports.getCtgrs= function(req, res) {
+	queries.getCtgr(function(err, data){
+		res.json(data);
+	});
+};
+
+exports.giveCtgr = function(req, res) {
+	var prod_ctgr = {
+		product: 	req.body.product,
+		category: 	req.body.category
+	};				
+	queries.giveCtgr(prod_ctgr, function(err, data){
+		res.json(data);
+	});
+};
+
+exports.removeCtgr = function(req, res){
+	var prod_ctgr = {
+		product: 	req.body.product,
+		category: 	req.body.category
+	};		
+	queries.removeCtgr(prod_ctgr, function(err, data){
+		res.json(data);
+	});
+}
+
+exports.getProductsByCtgr= function(req, res) {
+	queries.getProductsByCtgr(req.param('id'), function(err, data){
+		res.json(data);
+	});
+};
+
+exports.getCtgrsProduct= function(req, res) {
+	queries.getCtgrsProduct(req.param('id'), function(err, data){
+		res.json(data);
+	});
+};

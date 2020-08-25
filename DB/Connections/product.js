@@ -38,7 +38,6 @@ exports.create = function(obj, callback) {
 	});
 };
 
-
 exports.edit = function(obj, callback) {
 	var sqlQuery = 
 				"UPDATE `product` SET  										\
@@ -62,3 +61,75 @@ exports.delete = function (obj, callback){
 		callback(err, data);
 	});
 };
+
+/*	-- -----------------------------------------------------
+	-- 						CATEGORY
+	-- -----------------------------------------------------*/
+exports.createCtgr = function(obj, callback) {
+  	var sqlQuery = "INSERT INTO category (name, description)		\
+							VALUES ('" + obj.name			+ "',	\
+									'" + obj.desc 			+ "')";
+	DBHelper.doQuery(sqlQuery, function(err, data) {
+		callback(err, data);
+	});
+};
+
+exports.deleteCtgr = function (id, callback){
+	var sqlQuery = "DELETE FROM `category`   	\
+					WHERE `id` 	= '" + id + "'";
+	DBHelper.doQuery(sqlQuery, function(err, data){
+		callback(err, data);
+	});
+};
+
+exports.getCtgr = function(callback){
+	var sqlQuery = "SELECT id, name, description	\
+					FROM category					\
+					ORDER BY name DESC";
+	DBHelper.doQuery(sqlQuery, function(err, data) {
+		callback(err, data);
+	});
+}
+
+exports.giveCtgr = function(obj, callback) {
+  	var sqlQuery = "INSERT INTO prdtByCtg (product_id, category_id)		\
+							VALUES ('" + obj.product			+ "',	\
+									'" + obj.category 			+ "')";
+	DBHelper.doQuery(sqlQuery, function(err, data) {
+		callback(err, data);
+	});
+};
+
+exports.removeCtgr = function (obj, callback){
+	var sqlQuery = "DELETE FROM `prdtByCtg`   	\
+					WHERE `product_id` 	= '" + obj.product  + "' AND	\
+						  `category_id` = '" + obj.category + "' ";
+	DBHelper.doQuery(sqlQuery, function(err, data){
+		callback(err, data);
+	});
+};
+
+exports.getProductsByCtgr = function(id, callback){
+	var sqlQuery = "SELECT product.id, user.name, product.name,		\
+						   product.description, product.image, 		\
+						   product.price, product.amount			\
+					FROM product, user, category, prdtByCtg			\
+					WHERE category.id = '" + id + "' 				AND	\
+						  product.shop = user.id				AND	\
+						  category.id  = prdtByCtg.category_id  AND \
+						  prdtByCtg.product_id = product.id";
+	DBHelper.doQuery(sqlQuery, function(err, data) {
+		callback(err, data);
+	});
+}
+
+exports.getCtgrsProduct = function(id, callback){
+	var sqlQuery = "SELECT category.name, category.description		\
+					FROM product, category, prdtByCtg				\
+					WHERE product.id = '" + id + "' 			AND	\
+						  category.id  = prdtByCtg.category_id  AND \
+						  prdtByCtg.product_id = product.id";
+	DBHelper.doQuery(sqlQuery, function(err, data) {
+		callback(err, data);
+	});
+}
