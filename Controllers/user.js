@@ -158,3 +158,42 @@ exports.getShops= function(req, res) {
 		res.json(data);
 	});
 };
+
+/*	-- -----------------------------------------------------
+	-- 						RECHARGE
+	-- -----------------------------------------------------	*/
+
+exports.registerRecharge = function(req, res) {
+	var recharge = {
+		user: 		req.user.sub,
+		img: 		req.body.img
+	};				
+	queries.registerRecharge(recharge, function(err, data){
+		res.json(data);
+	});
+};
+
+exports.editRecharge = function(req, res){
+	var recharge = {
+		id: 	req.param('id'),
+		user: 	req.body.user,
+		admin: 	req.user.sub,
+		status: req.body.status,
+		value: 	req.body.value
+	};	
+	queries.editRecharge(recharge, function(err, data){
+		res.json(data);
+	});
+}
+
+exports.getMyRecharges = function(req, res) {
+	queries.getMyRecharges(req.user.sub, function(err, data){
+		res.json(data);
+	});
+};
+
+exports.getRecharges = function(req, res) {
+	queries.getRecharges(function(err, data){
+		res.json(data);
+	});
+};

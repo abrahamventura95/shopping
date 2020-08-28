@@ -127,3 +127,64 @@ exports.delete = function (id, callback){
 		callback(err, data);
 	});
 };
+
+/*	-- -----------------------------------------------------
+	-- 						RECHARGE
+	-- -----------------------------------------------------	*/
+exports.registerRecharge = function(obj, callback) {
+  	var sqlQuery = "INSERT INTO recharge (user, img)			\
+							VALUES ('" + obj.user		+ "',	\
+									'" + obj.img 		+ "')";
+	DBHelper.doQuery(sqlQuery, function(err, data) {
+		callback(err, data);
+	});
+};
+
+exports.editRecharge = function(obj, callback) {
+	var status = (obj.status == "TRUE");
+
+	var sqlQuery = 
+				"UPDATE `recharge` SET  								\
+				 	    `recharge`.`admin`		='" + obj.admin + "',	\
+				 	    `recharge`.`status`		="  + status	+ "		\
+				WHERE `recharge`.`id`			='" + obj.id 	+ "'";
+	DBHelper.doQuery(sqlQuery, function(err, data) {
+		if(status){
+			var userQuery = "SELECT balance 				\
+						     FROM user 						\
+						     WHERE id ='" + obj.user + "'";
+			
+			DBHelper.doQuery(userQuery, function(err, user){
+				let total = user[0].balance + obj.value;
+				var balance = "UPDATE `user` SET 						\
+							   		  `user`.balance = '" + total + "'";
+				
+				DBHelper.doQuery(balance, function(err, balance){
+					callback(err, balance);
+				});
+			});
+		}else{
+			callback(err,data);
+		}
+	});
+};
+
+exports.getMyRecharges = function(id, callback){
+	var sqlQuery = "SELECT id, img, status, created_at, updated_at	\
+					FROM recharge									\
+					WHERE user = '" + id + "'						\
+					ORDER BY status, updated_at DESC";
+	DBHelper.doQuery(sqlQuery, function(err, data) {
+		callback(err, data);
+	});
+};
+
+exports.getRecharges = function(callback){
+	var sqlQuery = "SELECT id, user, img, status, created_at, updated_at	\
+					FROM recharge											\
+					WHERE status = 'FALSE'									\
+					ORDER BY status, updated_at DESC";
+	DBHelper.doQuery(sqlQuery, function(err, data) {
+		callback(err, data);
+	});
+};

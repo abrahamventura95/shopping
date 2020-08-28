@@ -135,7 +135,7 @@ exports.getCtgrsProduct = function(id, callback){
 }
 
 /*	-- -----------------------------------------------------
-	-- Table `shopping`.`offer`
+	-- 						OFFER
 	-- -----------------------------------------------------	*/
 exports.createOffer = function(obj, callback) {
   	var sqlQuery = "INSERT INTO offer (price, until)		\

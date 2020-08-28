@@ -14,4 +14,10 @@ module.exports = function(app) {
 	  	.post(controller.create);
 	app.route('/login')
 	  	.post(controller.login); 
+	app.route('/recharge')
+		.post(auth.check, controller.registerRecharge)
+		.put(auth.check, auth.isAdmin, controller.editRecharge)
+		.get(auth.check, controller.getMyRecharges);	
+	app.route('/recharges')
+		.get(auth.check, auth.isAdmin, controller.getRecharges);	
 };
