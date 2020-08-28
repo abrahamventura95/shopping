@@ -108,3 +108,68 @@ exports.getCtgrsProduct= function(req, res) {
 		res.json(data);
 	});
 };
+
+/*	-- -----------------------------------------------------
+	-- 						OFFER
+	-- -----------------------------------------------------*/
+
+exports.createOffer = function(req, res) {
+	var offer = {
+		price: 	req.body.price,
+		until: 	req.body.until
+	};				
+	queries.createOffer(offer, function(err, data){
+		res.json(data);
+	});
+};
+
+exports.deleteOffer = function(req, res){
+	queries.deleteOffer(req.param('id'), function(err, data){
+		res.json(data);
+	});
+}
+
+exports.editOffer = function(req, res){
+	var offer = {
+		id: 	req.param('id'),
+		price: 	req.body.price,
+		status: req.body.status,
+		until: 	req.body.until
+	};					
+	queries.editOffer(offer, function(err, data){
+		res.json(data);
+	});
+}
+
+exports.getOffers = function(req, res) {
+	queries.getOffers(function(err, data){
+		res.json(data);
+	});
+};
+
+exports.addProductOffer = function(req, res) {
+	var offer = {
+		product: 	req.body.product,
+		offer: 		req.body.offer,
+		amount: 	req.body.amount
+	};				
+	queries.addProductOffer(offer, function(err, data){
+		res.json(data);
+	});
+};
+
+exports.rmvProductOffer = function(req, res){
+	var offer = {
+		product: 	req.body.product,
+		offer: 		req.body.offer
+	};	
+	queries.rmvProductOffer(offer, function(err, data){
+		res.json(data);
+	});
+}
+
+exports.getOfferProducts = function(req, res) {
+	queries.getOfferProducts(req.param('id'), function(err, data){
+		res.json(data);
+	});
+};

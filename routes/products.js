@@ -22,4 +22,15 @@ module.exports = function(app) {
 		.get(controller.getProductsByCtgr);
 	app.route('/product/categories')
 		.get(controller.getCtgrsProduct);
+	app.route('/offer')
+		.post(auth.check, auth.isShop, controller.createOffer)
+		.put(auth.check, auth.isShop, controller.editOffer)
+		.delete(auth.check, auth.isShop, controller.deleteOffer); 
+	app.route('/offers')
+		.get(controller.getOffers);
+	app.route('/offer/product')
+		.post(auth.check, auth.isShop, controller.addProductOffer)
+		.delete(auth.check, auth.isShop, controller.rmvProductOffer);
+	app.route('/offer/products')
+		.get(controller.getOfferProducts);
 };
