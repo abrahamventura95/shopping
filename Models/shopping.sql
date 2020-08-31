@@ -300,6 +300,89 @@ END$$
 
 
 DELIMITER ;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `buy`(IN id INT)
+BEGIN
+DECLARE cart INT; 
+DECLARE balance FLOAT;
+DECLARE totalProducts FLOAT;
+DECLARE totalOffer FLOAT;
+DECLARE products INT;
+DECLARE idProduct INT;
+DECLARE amountNeed INT;
+DECLARE amountIS INT;
+DECLARE i INT default 0;
+
+  start transaction;
+    SELECT `shoppingcart`.`id` INTO cart 
+      FROM `shoppingcart` 
+      WHERE `shoppingcart`.`user` = id AND
+          `shoppingcart`.`status` = FALSE
+      LIMIT 1;
+    SELECT `user`.`balance` INTO balance
+      FROM `user`
+            WHERE `user`.`id` = id;
+    SELECT SUM(`cartproduct`.`amount` * `product`.`price`) INTO totalProducts
+      FROM `cartproduct`, `product`
+            WHERE   `cartproduct`.`product` = `product`.`id` AND
+          `cartproduct`.`cart` = cart;
+        SELECT SUM(`offer`.`price`) INTO totalOffer
+      FROM `cartOffer`, `offer`
+            WHERE   `offer`.`id` = `cartOffer`.`offer` AND 
+          `cartOffer`.`cart` = cart;
+    IF (balance >= totalProducts + totalOffer) THEN
+      SELECT COUNT(`id`) INTO products 
+        FROM `cartproduct` 
+                WHERE `cart` = cart;    
+            WHILE i < products DO 
+        SELECT `product`.`id`, `product`.`amount`, `cartproduct`.`amount` INTO idProduct, amountIS, amountNeed
+          FROM `product`, `cartproduct`
+                    WHERE `cartproduct`.`product` = `product`.`id` AND
+                        `cartproduct`.`cart` = cart
+                    LIMIT i,1;
+        IF ( amountNeed <= amountIS ) THEN
+          UPDATE `product` SET
+               `product`.`amount` = amountIS - amountNeed
+          WHERE `product`.`id` = idProduct;
+                ELSE
+          ROLLBACK;
+        END IF; 
+                SELECT i + 1 INTO i;
+            END WHILE;
+            SELECT 0 INTO i;
+            SELECT COUNT(`product`.`id`) INTO products
+        FROM `product`, `prdtByoffer`, `offer`, `cartOffer`
+                WHERE `product`.`id` = `prdtByoffer`.`product_id` AND
+            `prdtByoffer`.`offer_id` = `offer`.`id`     AND
+                      `offer`.`id` = `cartOffer`.`offer`      AND
+                      `cartOffer`.`cart` = cart;
+            WHILE i < products DO          
+        SELECT `product`.`id`, `product`.`amount`, `prdtByoffer`.`amount` INTO idProduct, amountIS, amountNeed
+          FROM `product`, `prdtByoffer`, `offer`, `cartOffer`
+          WHERE `product`.`id` = `prdtByoffer`.`product_id` AND
+              `prdtByoffer`.`offer_id` = `offer`.`id`     AND
+              `offer`.`id` = `cartOffer`.`offer`      AND
+              `cartOffer`.`cart` = cart 
+          LIMIT i,1;
+                 IF ( amountNeed <= amountIS ) THEN
+          UPDATE `product` SET
+               `product`.`amount` = amountIS - amountNeed
+          WHERE `product`.`id` = idProduct;
+                ELSE
+          ROLLBACK;
+        END IF; 
+                SELECT i + 1 INTO i;
+            END WHILE; 
+            UPDATE `user` SET
+          `balance` = balance - (totalProducts + totalOffer)
+            WHERE `id` = id;     
+            UPDATE `shoppingChart` SET
+          `shoppingcart`.`status` = TRUE
+      WHERE `shoppingcart`.`id` = cart;
+            COMMIT;
+        ELSE 
+      ROLLBACK;
+        END IF;    
+END$$
 
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
