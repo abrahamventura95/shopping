@@ -277,10 +277,10 @@ USE `shopping`$$
 CREATE DEFINER = CURRENT_USER TRIGGER `shopping`.`shoppingChart_AFTER_UPDATE` AFTER UPDATE ON `shoppingChart` FOR EACH ROW
 BEGIN
 	IF new.status = true THEN
-		INSERT INTO purchart(`idchart`,`user`) VALUES(old.id,old.user);
+		INSERT INTO purchcart(`id`,`user`) VALUES(old.id,old.user);
         INSERT INTO prdctpurch(purchcart,shop,name,description,amount,price) 
-							SELECT chart.id, p.shop, p.name, p.description, p.amount, p.price 
-                            FROM product as p, cartproduct, (SELECT * FROM purchcart WHERE idchart = old.id) as chart
+							SELECT chart.id, p.shop, p.name, p.description, cartproduct.amount, p.price 
+                            FROM product as p, cartproduct, (SELECT * FROM purchcart WHERE id = old.id) as chart
                             WHERE p.id = cartproduct.product AND
 								                  cartproduct.cart = old.id;
          INSERT INTO offerpurch(purchcart,offer,price) 
@@ -313,10 +313,10 @@ DECLARE amountIS INT;
 DECLARE i INT default 0;
 
   start transaction;
-    SELECT `shoppingcart`.`id` INTO cart 
-      FROM `shoppingcart` 
-      WHERE `shoppingcart`.`user` = id AND
-          `shoppingcart`.`status` = FALSE
+    SELECT `shoppingchart`.`id` INTO cart 
+      FROM `shoppingchart` 
+      WHERE `shoppingchart`.`user` = id AND
+          `shoppingchart`.`status` = FALSE
       LIMIT 1;
     SELECT `user`.`balance` INTO balance
       FROM `user`
@@ -374,10 +374,11 @@ DECLARE i INT default 0;
             END WHILE; 
             UPDATE `user` SET
           `balance` = balance - (totalProducts + totalOffer)
-            WHERE `id` = id;     
-            UPDATE `shoppingChart` SET
-          `shoppingcart`.`status` = TRUE
-      WHERE `shoppingcart`.`id` = cart;
+            WHERE `id` = id
+            LIMIT 1;     
+            UPDATE `shoppingchart` SET
+          `shoppingchart`.`status` = TRUE
+      WHERE `shoppingchart`.`id` = cart;
             COMMIT;
         ELSE 
       ROLLBACK;
